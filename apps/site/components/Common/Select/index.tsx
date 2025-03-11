@@ -166,12 +166,13 @@ const Select = <T extends string>({
 
           <SelectPrimitive.Portal>
             <SelectPrimitive.Content
+              ref={scrollViewportRef}
               position={inline ? 'popper' : 'item-aligned'}
               className={classNames(styles.dropdown, {
                 [styles.inline]: inline,
               })}
             >
-              <ScrollPrimitive.Root type="auto" ref={scrollViewportRef}>
+              <ScrollPrimitive.Root type="auto">
                 <SelectPrimitive.Viewport>
                   <ScrollPrimitive.Viewport>
                     {memoizedMappedValues}

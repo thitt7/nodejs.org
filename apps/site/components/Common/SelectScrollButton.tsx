@@ -1,7 +1,8 @@
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
-import { useEffect, useRef, useState, type RefObject, type FC } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { type FC, type RefObject } from 'react';
 
-import styles from './index.module.css';
+import styles from './Select/index.module.css';
 
 type SelectScrollButtonProps = {
   direction: 'up' | 'down';
@@ -32,6 +33,11 @@ const SelectScrollButton: FC<SelectScrollButtonProps> = ({
       if (!container) return;
 
       if (direction === 'down') {
+        console.log(
+          container.scrollTop,
+          container.scrollHeight,
+          container.clientHeight
+        );
         setIsVisible(
           container.scrollTop < container.scrollHeight - container.clientHeight
         );
@@ -55,11 +61,13 @@ const SelectScrollButton: FC<SelectScrollButtonProps> = ({
   // Scrolling effect
   useEffect(() => {
     if (isScrolling && isVisible && scrollContainerRef?.current) {
+      console.log('scrolling...', scrollContainerRef?.current);
       intervalRef.current = window.setInterval(() => {
         if (scrollContainerRef.current) {
           if (direction === 'down') {
             const container = scrollContainerRef.current;
-            container.scrollTop += scrollAmount;
+            // container.scrollTop += scrollAmount;
+            container.scrollBy({ top: 25, behavior: 'smooth' });
 
             if (
               container.scrollTop >=
@@ -96,7 +104,7 @@ const SelectScrollButton: FC<SelectScrollButtonProps> = ({
     scrollInterval,
   ]);
 
-  if (!isVisible) return null;
+  // if (!isVisible) return null;
 
   return (
     <div
