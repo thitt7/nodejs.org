@@ -4,13 +4,14 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import * as ScrollPrimitive from '@radix-ui/react-scroll-area';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import classNames from 'classnames';
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState, useRef } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 
 import Skeleton from '@/components/Common/Skeleton';
 import type { FormattedMessage } from '@/types';
 
 import styles from './index.module.css';
+import SelectScrollButton from '../SelectScrollButton';
 
 export type SelectValue<T extends string> = {
   label: FormattedMessage | string;
@@ -59,6 +60,7 @@ const Select = <T extends string>({
 }: SelectProps<T>): ReactNode => {
   const id = useId();
   const [value, setValue] = useState(defaultValue);
+  const scrollViewportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => setValue(defaultValue), [defaultValue]);
 
@@ -169,7 +171,7 @@ const Select = <T extends string>({
                 [styles.inline]: inline,
               })}
             >
-              <ScrollPrimitive.Root type="auto">
+              <ScrollPrimitive.Root type="auto" ref={scrollViewportRef}>
                 <SelectPrimitive.Viewport>
                   <ScrollPrimitive.Viewport>
                     {memoizedMappedValues}
@@ -179,6 +181,11 @@ const Select = <T extends string>({
                   <ScrollPrimitive.Thumb />
                 </ScrollPrimitive.Scrollbar>
               </ScrollPrimitive.Root>
+
+              <SelectScrollButton
+                direction="down"
+                scrollContainerRef={scrollViewportRef}
+              />
             </SelectPrimitive.Content>
           </SelectPrimitive.Portal>
         </SelectPrimitive.Root>
