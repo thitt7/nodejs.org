@@ -6,38 +6,75 @@ import styles from './Select/index.module.css';
 
 type SelectScrollButtonProps = {
   direction: 'up' | 'down';
-  scrollContainerRef?: RefObject<HTMLElement>;
+  selectContentRef?: RefObject<HTMLElement>;
   scrollAmount?: number;
   scrollInterval?: number;
 };
 
 const SelectScrollButton: FC<SelectScrollButtonProps> = ({
   direction,
-  scrollContainerRef,
-  scrollAmount = 5,
+  selectContentRef,
+  scrollAmount = 35,
   scrollInterval = 50,
 }) => {
   const DirectionComponent =
     direction === 'down' ? ChevronDownIcon : ChevronUpIcon;
-  const [isScrolling, setIsScrolling] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [hasOverflow, setOverflow] = useState(false);
   const intervalRef = useRef<number | null>(null);
+  const isScrollingRef = useRef(false);
 
-  // Check if scrolling in the given direction is possible
+  const clearScrollInterval = () => {
+    if (intervalRef.current !== null) {
+      window.clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
+  const startScrolling = () => {
+    if (!selectContentRef?.current || !isVisible || !hasOverflow) return;
+
+    clearScrollInterval();
+
+    intervalRef.current = window.setInterval(() => {
+      if (!selectContentRef.current || !isScrollingRef.current) return;
+
+      const container = selectContentRef.current;
+
+      if (direction === 'down') {
+        container.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+
+        if (
+          container.scrollTop >=
+          container.scrollHeight - container.clientHeight
+        ) {
+          clearScrollInterval();
+          setIsVisible(false);
+        }
+      } else {
+        container.scrollBy({
+          top: -Math.abs(scrollAmount),
+          behavior: 'smooth',
+        });
+
+        if (container.scrollTop <= 0) {
+          clearScrollInterval();
+          setIsVisible(false);
+        }
+      }
+    }, scrollInterval);
+  };
+
   useEffect(() => {
-    if (!scrollContainerRef?.current) return;
+    if (!selectContentRef?.current) return;
 
-    const container = scrollContainerRef.current;
+    const container = selectContentRef.current;
+    setOverflow(container.scrollHeight > container.clientHeight);
 
-    const checkScrollability = () => {
+    const updateButtonVisibility = () => {
       if (!container) return;
 
       if (direction === 'down') {
-        console.log(
-          container.scrollTop,
-          container.scrollHeight,
-          container.clientHeight
-        );
         setIsVisible(
           container.scrollTop < container.scrollHeight - container.clientHeight
         );
@@ -46,72 +83,44 @@ const SelectScrollButton: FC<SelectScrollButtonProps> = ({
       }
     };
 
-    checkScrollability();
+    updateButtonVisibility();
 
-    const handleScroll = () => checkScrollability();
+    const handleScroll = () => {
+      updateButtonVisibility();
+
+      if (!isScrollingRef.current && intervalRef.current !== null) {
+        clearScrollInterval();
+      }
+    };
+
     container.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', checkScrollability);
+    window.addEventListener('resize', updateButtonVisibility);
 
     return () => {
       container.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', checkScrollability);
+      window.removeEventListener('resize', updateButtonVisibility);
+      clearScrollInterval();
     };
-  }, [direction, scrollContainerRef]);
+  }, [direction, selectContentRef]);
 
-  // Scrolling effect
-  useEffect(() => {
-    if (isScrolling && isVisible && scrollContainerRef?.current) {
-      console.log('scrolling...', scrollContainerRef?.current);
-      intervalRef.current = window.setInterval(() => {
-        if (scrollContainerRef.current) {
-          if (direction === 'down') {
-            const container = scrollContainerRef.current;
-            // container.scrollTop += scrollAmount;
-            container.scrollBy({ top: 25, behavior: 'smooth' });
+  const handleMouseEnter = () => {
+    isScrollingRef.current = true;
+    startScrolling();
+  };
 
-            if (
-              container.scrollTop >=
-              container.scrollHeight - container.clientHeight
-            ) {
-              setIsScrolling(false);
-              setIsVisible(false);
-            }
-          } else {
-            const container = scrollContainerRef.current;
-            container.scrollTop -= scrollAmount;
+  const handleMouseLeave = () => {
+    isScrollingRef.current = false;
+    clearScrollInterval();
+  };
 
-            if (container.scrollTop <= 0) {
-              setIsScrolling(false);
-              setIsVisible(false);
-            }
-          }
-        }
-      }, scrollInterval);
-    }
-
-    return () => {
-      if (intervalRef.current !== null) {
-        window.clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [
-    isScrolling,
-    isVisible,
-    direction,
-    scrollContainerRef,
-    scrollAmount,
-    scrollInterval,
-  ]);
-
-  // if (!isVisible) return null;
+  if (!isVisible) return null;
 
   return (
     <div
       className={styles.scrollBtn}
       data-direction={direction}
-      onMouseEnter={() => setIsScrolling(true)}
-      onMouseLeave={() => setIsScrolling(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <DirectionComponent className={styles.scrollBtnIcon} aria-hidden="true" />
     </div>

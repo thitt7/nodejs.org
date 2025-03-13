@@ -151,9 +151,10 @@
 }
 
 .scrollBtn {
-  @apply absolute
+  @apply sticky
     z-10
     flex
+    w-full
     cursor-pointer
     justify-center
     bg-white
@@ -162,23 +163,14 @@
     hover:bg-neutral-100
     dark:bg-neutral-950
     dark:hover:bg-neutral-900;
-
-  left: 1px;
-  right: 1px;
 }
 
 .scrollBtn[data-direction='down'] {
-  /* @apply bottom-1; */
-  border-bottom-left-radius: 0.25rem;
-  border-bottom-right-radius: 0.25rem;
-  bottom: 1px;
+  bottom: 0;
 }
 
 .scrollBtn[data-direction='up'] {
-  /* @apply top-1; */
-  border-top-left-radius: 0.25rem;
-  border-top-right-radius: 0.25rem;
-  top: 1px;
+  top: 0;
 }
 
 .scrollBtnIcon {

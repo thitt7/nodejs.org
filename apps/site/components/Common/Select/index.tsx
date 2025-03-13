@@ -60,7 +60,7 @@ const Select = <T extends string>({
 }: SelectProps<T>): ReactNode => {
   const id = useId();
   const [value, setValue] = useState(defaultValue);
-  const scrollViewportRef = useRef<HTMLDivElement>(null);
+  const SelectContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => setValue(defaultValue), [defaultValue]);
 
@@ -166,7 +166,7 @@ const Select = <T extends string>({
 
           <SelectPrimitive.Portal>
             <SelectPrimitive.Content
-              ref={scrollViewportRef}
+              ref={SelectContentRef}
               position={inline ? 'popper' : 'item-aligned'}
               className={classNames(styles.dropdown, {
                 [styles.inline]: inline,
@@ -182,10 +182,9 @@ const Select = <T extends string>({
                   <ScrollPrimitive.Thumb />
                 </ScrollPrimitive.Scrollbar>
               </ScrollPrimitive.Root>
-
               <SelectScrollButton
                 direction="down"
-                scrollContainerRef={scrollViewportRef}
+                selectContentRef={SelectContentRef}
               />
             </SelectPrimitive.Content>
           </SelectPrimitive.Portal>
