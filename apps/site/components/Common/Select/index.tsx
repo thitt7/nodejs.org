@@ -7,11 +7,11 @@ import classNames from 'classnames';
 import { useEffect, useId, useMemo, useState, useRef } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 
+import SelectScrollButton from '@/components/Common/Select/SelectScrollButton';
 import Skeleton from '@/components/Common/Skeleton';
 import type { FormattedMessage } from '@/types';
 
 import styles from './index.module.css';
-import SelectScrollButton from '../SelectScrollButton';
 
 export type SelectValue<T extends string> = {
   label: FormattedMessage | string;

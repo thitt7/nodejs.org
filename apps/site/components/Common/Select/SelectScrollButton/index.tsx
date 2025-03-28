@@ -2,7 +2,7 @@ import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { useEffect, useRef, useState } from 'react';
 import { type FC, type RefObject } from 'react';
 
-import styles from './Select/index.module.css';
+import styles from '@/components/Common/Select/index.module.css';
 
 type SelectScrollButtonProps = {
   direction: 'up' | 'down';
